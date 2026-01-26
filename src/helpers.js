@@ -33,7 +33,7 @@ export function loadLastMessage() {
   return lastMessage
 }
 
-export function saveLastMessage({ date, message_id, text } = {}) {
+export function saveLastMessage({ date, message_id, text, period } = {}) {
   fs.mkdirSync(path.dirname(LAST_MESSAGE_FILE), { recursive: true })
   fs.writeFileSync(
     LAST_MESSAGE_FILE,
@@ -42,6 +42,7 @@ export function saveLastMessage({ date, message_id, text } = {}) {
         message_id,
         date,
         text,
+        period,
       },
       null,
       2
@@ -49,6 +50,7 @@ export function saveLastMessage({ date, message_id, text } = {}) {
     "utf8"
   )
 }
+
 
 export function deleteLastMessage() {
   fs.rmdirSync(path.dirname(LAST_MESSAGE_FILE), { recursive: true })
