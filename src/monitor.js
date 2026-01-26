@@ -107,16 +107,16 @@ function generateMessage(info) {
   const { sub_type, start_date, end_date } = info?.data?.[HOUSE] || {}
   const { updateTimestamp } = info || {}
 
-  const reason = capitalize(sub_type)
+  const reason = capitalize(sub_type).replace(/\bЕкстренні\b/g, "Екстрені")
   const begin = start_date.split(" ")[0]
   const end = end_date.split(" ")[0]
 
   return [
-    "🚨🚨<b>Екстрене (аварійне) відключення:</b>",
-    `<blockquote><code>🌚${begin} — ${end}</code></blockquote>`,
+    "🚨🚨 <b>Екстрене (аварійне) відключення:</b>",
+    `<blockquote><code>🌚 ${begin}—${end}</code></blockquote>`,
     "",
-    `⚠️<b>Причина: </b><i>${reason}.</i>`,
-    "\n",
+    `⚠️ <b>Причина: </b><i>${reason}.</i>`,
+    "",
     `🔄 <b>Час оновлення: </b> <i>${updateTimestamp}</i>`,
     `Джерело: <a href="https://www.dtek-kem.com.ua/ua/shutdowns">ДТЕК Київські електромережі</a>`
   ].join("\n")
