@@ -34,7 +34,7 @@ async function getInfo() {
     const csrfToken = await csrfTokenTag.getAttribute("content")
 
     const info = await browserPage.evaluate(
-      async ({ CITY, STREET, csrfToken }) => {
+      async ({ STREET, csrfToken }) => {
         const formData = new URLSearchParams()
         formData.append("method", "getHomeNum")
         formData.append("data[1][name]", "street")
@@ -52,7 +52,7 @@ async function getInfo() {
         })
         return await response.json()
       },
-      { CITY, STREET, csrfToken }
+      { STREET, csrfToken }
     )
 
     console.log("✅ Getting info finished.")
