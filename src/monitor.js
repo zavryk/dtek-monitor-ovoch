@@ -112,13 +112,13 @@ function generateMessage(info) {
   const end = end_date.split(" ")[0]
 
   return [
-    "🚨 <b>Отримано інформацію про знеструмлення:</b>",
-    `🪫 <b>Час: </b><code>${begin} — ${end}</code>`,
+    "🚨🚨<b>Екстрене (аварійне) відключення:</b>",
+    `<blockquote><code>🌚${begin} — ${end}</code></blockquote>`,
     "",
     `⚠️<b>Причина: </b><i>${reason}.</i>`,
     "\n",
-    `🔄 <b>Час оновлення інформації: </b> <i>${updateTimestamp}</i>`,
-    `Джерело : https://www.dtek-kem.com.ua/ua/shutdowns`,
+    `🔄 <b>Час оновлення: </b> <i>${updateTimestamp}</i>`,
+    `Джерело: <a href="https://www.dtek-kem.com.ua/ua/shutdowns">ДТЕК Київські електромережі</a>`
   ].join("\n")
 }
 
