@@ -116,15 +116,14 @@ function generateMessage(info) {
 
   const period = sameDay
     ? `${beginTime} — ${endTime} ${endDate}`
-    : `${beginTime} ${beginDate} — /n ${endTime} ${endDate}`
+    : `${beginTime} ${beginDate} — \n ${endTime} ${endDate}`
 
  
 
   return [
     "🚨🚨 <b>Екстрене відключення:</b>",
-    `<blockquote><code>🌚 ${period}</code></blockquote>`,
-    `Початок: <blockquote><code>🌚 ${beginTime} ${beginDate}</code></blockquote>`,
-    `Кінець:  <blockquote><code>🌞 ${endTime} ${endDate}</code></blockquote>`,
+     //`<blockquote><code>🌑 ${period}</code></blockquote>`,
+    `<blockquote><code>🌑 ${beginTime} ${beginDate}\n🌕 ${endTime} ${endDate}</code></blockquote>`,
     "",
     `⚠️ <b>Причина: </b><i>${reason}.</i>`,
     "",
