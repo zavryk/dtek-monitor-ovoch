@@ -241,7 +241,7 @@ async function run() {
   if (wasEmergencyBefore) {
     console.log("✅ DEBUG: Emergency ended condition matched. Sending ended message...")
     const endedText = generateEndedMessage(info)
-    await sendNotification(endedText, "__ENDED__", false)
+    await sendNotification(endedText, null, false)
     return
   }
 
