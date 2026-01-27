@@ -222,7 +222,7 @@ async function run() {
       return
     }
 
-    await sendNotification(text, period)
+    await sendNotification(text, period, true)
 
     // ВАЖЛИВО: після успішної відправки збережи is_emergency=true
     // Для цього онови sendNotification (див. нижче)
@@ -234,7 +234,7 @@ async function run() {
     const endedText = generateEndedMessage(info)
 
     // відправляємо один раз
-    await sendNotification(endedText, "__ENDED__")
+    await sendNotification(endedText, "__ENDED__", false)
 
     // і збережемо is_emergency=false (див. sendNotification нижче)
     return
