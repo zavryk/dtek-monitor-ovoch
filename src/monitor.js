@@ -187,7 +187,7 @@ async function sendNotification(text, period, is_emergency) {
     }
 
     saveLastMessage({
-      message_id: data.result.message_id,
+      message_id: data.result.message_id, 
       date: data.result.date,
       text,
       period,
@@ -210,7 +210,15 @@ async function run() {
   const isEmergencyNow = isOutage && !isScheduled
 
   const lastMessage = loadLastMessage() || {}
+  console.log("DEBUG lastMessage =", lastMessage)
   const wasEmergencyBefore = lastMessage.is_emergency === true
+  console.log("DEBUG flags =", {
+  isOutage,
+  isScheduled,
+  isEmergencyNow,
+  wasEmergencyBefore,
+  lastPeriod: lastMessage.period,
+})
 
   // 1) Екстрене зараз
   if (isEmergencyNow) {
@@ -231,12 +239,9 @@ async function run() {
 
   // 2) Екстреного зараз немає, але раніше було → “скінчилося”
   if (wasEmergencyBefore) {
+    console.log("✅ DEBUG: Emergency ended condition matched. Sending ended message...")
     const endedText = generateEndedMessage(info)
-
-    // відправляємо один раз
     await sendNotification(endedText, "__ENDED__", false)
-
-    // і збережемо is_emergency=false (див. sendNotification нижче)
     return
   }
 
