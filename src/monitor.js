@@ -106,7 +106,7 @@ function generateEndedMessage(info) {
   return [
     "🔋💡 <b>Екстрене відключення завершилось</b>",
     "",
-    "⚠ <b>Заживлення може тривати деякий час</b>",
+    `⚠ <b>Заживлення може тривати деякий час</b>`,
     "",
     `🔄 <b>Оновлено: </b> <i>${updateTimestamp || ""}</i>`,
     `🔗 <b>Джерело: </b><a href="https://www.dtek-kem.com.ua/ua/shutdowns">ДТЕК КЕМ</a>`,
