@@ -101,6 +101,19 @@ function checkIsScheduled(info) {
   return isScheduled
 }
 
+function generateEndedMessage(info) {
+  const { updateTimestamp } = info || {}
+  return [
+    "🔋💡 <b>Екстрене відключення завершилось</b>",
+    "",
+    "⚠ <b>Заживлення може тривати деякий час</b>",
+    "",
+    `🔄 <b>Оновлено: </b> <i>${updateTimestamp || ""}</i>`,
+    `🔗 <b>Джерело: </b><a href="https://www.dtek-kem.com.ua/ua/shutdowns">ДТЕК КЕМ</a>`,
+  ].filter(Boolean).join("\n")
+}
+
+
 function generateMessage(info) {
   console.log("🌀 Generating message...")
 
@@ -137,22 +150,22 @@ function isQuietHoursKyiv() {
 }
 
 
-async function sendNotification(text, period) {
+async function sendNotification(text, period, is_emergency) {
   if (!TELEGRAM_BOT_TOKEN) throw Error("❌ Missing telegram bot token.")
   if (!TELEGRAM_CHAT_ID) throw Error("❌ Missing telegram chat id.")
 
   const lastMessage = loadLastMessage() || {}
 
-  // ✅ якщо період не змінився — нічого не робимо
-  if (lastMessage.period === period) {
-    console.log("🟡 Period unchanged. Skip sending.")
+  // дедуп лише для однакового period у тому ж стані
+  if (lastMessage.period === period && lastMessage.is_emergency === is_emergency) {
+    console.log("🟡 State unchanged. Skip sending.")
     return
   }
 
   console.log("🌀 Sending notification...")
 
   const disable_notification = isQuietHoursKyiv()
-  
+
   try {
     const response = await fetch(
       `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
@@ -172,18 +185,16 @@ async function sendNotification(text, period) {
     if (!response.ok || data.ok === false) {
       throw Error(`Telegram API error: ${data.description || response.status}`)
     }
-    
+
     saveLastMessage({
       message_id: data.result.message_id,
       date: data.result.date,
       text,
       period,
+      is_emergency,
     })
 
-  
-    console.log(
-      disable_notification ? "🟢 Notification sent (silent)." : "🟢 Notification sent."
-    )
+    console.log(disable_notification ? "🟢 Sent (silent)." : "🟢 Sent.")
   } catch (error) {
     console.log("🔴 Notification not sent.", error.message)
     deleteLastMessage()
@@ -191,19 +202,47 @@ async function sendNotification(text, period) {
 }
 
 
-
 async function run() {
   const info = await getInfo()
+
   const isOutage = checkIsOutage(info)
+  const isScheduled = isOutage ? checkIsScheduled(info) : false
+  const isEmergencyNow = isOutage && !isScheduled
 
-  if (!isOutage) return
+  const lastMessage = loadLastMessage() || {}
+  const wasEmergencyBefore = lastMessage.is_emergency === true
 
-  const isScheduled = checkIsScheduled(info)
-  if (isOutage && !isScheduled) {
+  // 1) Екстрене зараз
+  if (isEmergencyNow) {
     const { text, period } = generateMessage(info)
+
+    // дедуп по period як і було
+    if (lastMessage.period === period && wasEmergencyBefore) {
+      console.log("🟡 Emergency period unchanged. Skip sending.")
+      return
+    }
+
     await sendNotification(text, period)
 
+    // ВАЖЛИВО: після успішної відправки збережи is_emergency=true
+    // Для цього онови sendNotification (див. нижче)
+    return
   }
+
+  // 2) Екстреного зараз немає, але раніше було → “скінчилося”
+  if (wasEmergencyBefore) {
+    const endedText = generateEndedMessage(info)
+
+    // відправляємо один раз
+    await sendNotification(endedText, "__ENDED__")
+
+    // і збережемо is_emergency=false (див. sendNotification нижче)
+    return
+  }
+
+  // 3) Екстреного немає і раніше не було
+  console.log("ℹ️ No emergency now.")
 }
+
 
 run().catch((error) => console.error(error.message))
